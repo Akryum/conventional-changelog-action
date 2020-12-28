@@ -96,6 +96,11 @@ inputs:
     description: 'Path to the pre-changelog-generation script file'
     required: false
 
+  skip-bump:
+    description: 'Skip bumping the version'
+    default: 'false'
+    required: false
+
 
 outputs:
   changelog:

@@ -18,7 +18,9 @@ async function handleVersioningByExtension(ext, file, versionPath, releaseType) 
   versioning.init(path.resolve(process.cwd(), file), versionPath)
 
   // Bump the version in the package.json
-  await versioning.bump(releaseType)
+  if (releaseType) {
+    await versioning.bump(releaseType)
+  }
 
   return versioning
 }
@@ -40,6 +42,7 @@ async function run() {
     const skipEmptyRelease = core.getInput('skip-on-empty').toLowerCase() === 'true'
     const conventionalConfigFile = core.getInput('config-file-path')
     const preChangelogGenerationFile = core.getInput('pre-changelog-generation')
+    const skipBump = core.getInput('skip-bump').toLowerCase() === 'true'
 
     core.info(`Using "${preset}" preset`)
     core.info(`Using "${gitCommitMessage}" as commit message`)
@@ -92,7 +95,7 @@ async function run() {
           'git',
           versionFile,
           versionPath,
-          recommendation.releaseType,
+          skipBump ? null : recommendation.releaseType,
         )
 
         newVersion = versioning.newVersion
@@ -106,7 +109,7 @@ async function run() {
             const fileExtension = file.split('.').pop()
             core.info(`Bumping version to file "${file}" with extension "${fileExtension}"`)
 
-            return handleVersioningByExtension(fileExtension, file, versionPath, recommendation.releaseType)
+            return handleVersioningByExtension(fileExtension, file, versionPath, skipBump ? null : recommendation.releaseType)
           }),
         )
 
